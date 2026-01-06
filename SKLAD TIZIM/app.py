@@ -4,6 +4,78 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import os
+from datetime import datetime, timedelta
+from functools import wraps
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key-change-this'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sklad.db'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)  # 7 kun sessiya
+app.config['SESSION_COOKIE_SECURE'] = False  # True bo‘lsa, faqat HTTPSda ishlaydi
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+db = SQLAlchemy(app)
+
+# ====================== MODELS ======================
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(50), default='viewer')  # (legacy, not used)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Batch(db.Model):
+    __tablename__ = 'batches'
+    id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.String(200), nullable=False)
+    batch_code = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Integer, nullable=True)
+    quantity_sht = db.Column(db.Integer, nullable=True)
+    quantity_kg = db.Column(db.Float, nullable=True)
+    comment = db.Column(db.String(255), nullable=True)
+    location = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(50), default='ACTIVE')  # 'ACTIVE' or 'REMOVED'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    removed_at = db.Column(db.DateTime)
+    removed_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', backref='batches_removed')
+
+# ====================== DECORATORS ======================
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# ====================== QATORLAR MATRITSA STATUS API ======================
+@app.route('/api/rows_matrix_status')
+@login_required
+def rows_matrix_status():
+    sectors = ['A', 'B', 'C']
+    rows = 9
+    cells = 4
+    matrix = {}
+    for sector in sectors:
+        matrix[sector] = []
+        for row in range(1, rows+1):
+            row_cells = []
+            for cell in range(1, cells+1):
+                loc = f"{sector}-{row}-{cell}"
+                batch = Batch.query.filter_by(location=loc).filter(
+                    ((Batch.quantity_sht != None) & (Batch.quantity_sht > 0)) |
+                    ((Batch.quantity_kg != None) & (Batch.quantity_kg > 0))
+                ).first()
+                row_cells.append('busy' if batch else 'free')
+            matrix[sector].append(row_cells)
+    return jsonify(matrix)
+from sqlalchemy import or_
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+import sqlite3
+import os
 from datetime import datetime
 from functools import wraps
 
@@ -95,6 +167,30 @@ def search_batches():
         })
     return jsonify({'results': results, 'total': total})
 # ====================== BATCH OPERATIONS ======================
+
+# Qatorlar holati (demo, realda DBdan olinadi)
+@app.route('/api/rows_status', methods=['GET', 'POST'])
+@login_required
+def rows_status():
+    # Demo uchun, realda DBdan olinadi yoki sessiondan
+    if request.method == 'GET':
+        rows = [
+            {'id': 1, 'status': 'free'},
+            {'id': 2, 'status': 'busy'},
+            {'id': 3, 'status': 'free'},
+            {'id': 4, 'status': 'busy'},
+            {'id': 5, 'status': 'free'},
+            {'id': 6, 'status': 'free'},
+            {'id': 7, 'status': 'free'},
+            {'id': 8, 'status': 'free'},
+            {'id': 9, 'status': 'free'}
+        ]
+        return jsonify(rows)
+    elif request.method == 'POST':
+        data = request.get_json()
+        # Demo: statusni o'zgartirishni qaytaradi
+        return jsonify({'success': True, 'row_id': data.get('id'), 'new_status': data.get('status')})
+
 @app.route('/')
 @login_required
 def index():
