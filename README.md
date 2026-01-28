@@ -43,12 +43,7 @@ python app.py
 http://127.0.0.1:5000
 ```
 
-## 👤 Kirish ma'lumotlari
 
-| Foydalanuvchi | Parol |
-|---------------|-------|
-| admin | admin123 |
-| user | user123 |
 
 ## 📁 Loyiha tuzilishi
 
