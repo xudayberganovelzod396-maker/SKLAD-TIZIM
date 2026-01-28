@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKLAD TIZIM - Главная</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .user-info {
+            font-size: 14px;
+            display: none;
+        }
+        
+        /* .user-info .role { ... } removed */
+        
+        .profile-btn {
+            background: rgba(255,255,255,0.18);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.6);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+        }
+        
+        .profile-btn:hover {
+            background: rgba(255,255,255,0.35);
+            transform: translateY(-1px);
+        }
+        
+        .profile-menu {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            min-width: 180px;
+            display: none;
+            z-index: 1001;
+            overflow: hidden;
+        }
+        
+        .profile-menu.show {
+            display: block;
+        }
+        
+        .profile-menu-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s;
+        }
+        
+        .profile-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .profile-menu-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .logout-btn-header {
+            background: rgba(255,255,255,0.18);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.6);
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+            backdrop-filter: blur(6px);
+        }
+        
+        .logout-btn-header:hover {
+            background: rgba(255,255,255,0.35);
+            transform: translateY(-1px);
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 30px;
+            gap: 16px;
+        }
+        
+        .profile-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 4px solid #667eea;
+        }
+        
+        .profile-section h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+            background: #667eea;
+            color: white;
+            padding: 10px 15px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin: 0 auto 20px;
+        }
+        
+        
+        .profile-info-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .profile-info-label {
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .profile-info-value {
+            font-size: 16px;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .form-group-profile {
+            margin-bottom: 15px;
+        }
+        
+        .form-group-profile label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .form-group-profile input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+        
+        .form-group-profile input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .password-hint {
+            font-size: 14px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .btn-change-password {
+            width: 100%;
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        .btn-change-password:hover {
+            background: #764ba2;
+        }
+        
+        .activity-text {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .btn-close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            color: #222;
+            border: none;
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 28px;
+        }
+        
+        .btn-close-modal:hover {
+            background: #ff5252;
+        }
+        
+        @media (max-width: 900px) {
+            .modal-content {
+                grid-template-columns: 1fr;
+                max-width: 95%;
+            }
+        }
+        
+        button.add-btn {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            min-width: 140px;
+            height: 40px;
+        }
+        
+        button.add-btn:hover {
+            background: #219150;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        #adminSection {
+            display: none;
+        }
+        
+        #adminSection.show {
+            display: flex;
+        }
+        
+        #adminSection h2 {
+            margin-top: 0;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            display: none;
+            z-index: 999;
+        }
+        
+        .overlay.show {
+            display: block;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        #requestsList table tr:hover,
+        #requestsDoneList table tr:hover {
+            background: #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 22px 10px 10px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group input::placeholder {
+            color: transparent;
+        }
+        
+        .form-group label {
+            position: absolute;
+            top: 18px;
+            left: 12px;
+            font-size: 14px;
+            color: #999;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            background: white;
+            padding: 0 4px;
+        }
+        
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: 2px;
+            left: 8px;
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+            background: white;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        
+        .search-box {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            padding: 0 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-box::before {
+            content: "🔍";
+            margin-right: 10px;
+            font-size: 18px;
+            color: #999;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            outline: none;
+            background: transparent;
+        }
+        
+        .search-box input::placeholder {
+            color: #999;
+        }
+        
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+        
+        .search-btn:hover {
+            background: #5568d3;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .table thead {
+            background: #f0f0f0;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .batch-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 7px 12px 7px 14px;
+            margin-bottom: 0px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .batch-item.sliding {
+            animation: slideOut 0.5s ease-in forwards;
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        .batch-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .batch-title {
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 0;
+            font-size: 1.35rem;
+        }
+        
+        .batch-meta {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            column-gap: 10px;
+            row-gap: 6px;
+            font-size: 1.15rem;
+            color: #222;
+        }
+        
+        .batch-meta span {
+            display: flex;
+            gap: 5px;
+            font-size: 1.13rem;
+            line-height: 1.25;
+        }
+        
+        .batch-meta strong {
+            color: #111;
+            font-size: 1.13rem;
+            font-weight: 700;
+        }
+
+
+        .batch-comment {
+            line-height: 1.25;
+        }
+        
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: 15px;
+        }
+        
+        .btn-slide {
+            background: #ff6b6b;
+            padding: 8px 15px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        
+        .btn-slide:hover {
+            background: #ff5252;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .batch-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .batch-actions {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .batch-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>🏬 SKLAD TIZIM</h1>
+            <div class="header-right">
+                <div class="user-info">
+                    👤 <strong id="username"></strong>
+                    <!-- <span class="role" id="role"></span> -->
+                </div>
+                <div style="position: relative; display: inline-block;">
+                    <button class="profile-btn" id="profileBtn">👤</button>
+                </div>
+                <a href="/logout" class="logout-btn-header">
+                    Выход →
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <button class="btn-close-modal" onclick="closeProfileModal()">✕</button>
+            
+            <!-- Left Section: User Info -->
+            <div class="profile-section">
+                <h3>👤 Пользователь</h3>
+                <div class="profile-avatar">👤</div>
+                <div class="profile-info">
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">👤 ФИО</div>
+                        <div class="profile-info-value" id="userFullName">Nomalarim</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">📧 E-Mail</div>
+                        <div class="profile-info-value" id="userEmail">email@example.com</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">👤 Имя</div>
+                        <div class="profile-info-value" id="userFirstName">-</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">👤 Фамилия</div>
+                        <div class="profile-info-value" id="userLastName">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Middle Section: Change Password -->
+            <div class="profile-section">
+                <h3>🔐 Смена пароля</h3>
+                <form id="changePasswordForm">
+                    <div class="form-group-profile">
+                        <label for="currentPassword">Текущий пароль</label>
+                        <input type="password" id="currentPassword" placeholder="Введите текущий пароль">
+                    </div>
+                    <div class="form-group-profile">
+                        <label for="newPassword">Новый пароль</label>
+                        <input type="password" id="newPassword" placeholder="Введите новый пароль">
+                    </div>
+                    <div class="form-group-profile">
+                        <label for="confirmPassword">Подтвердите пароль</label>
+                        <input type="password" id="confirmPassword" placeholder="Повторите пароль">
+                        <div class="password-hint">От 5 до 50 символов — цифры, буквы и знаки</div>
+                    </div>
+                    <button type="submit" class="btn-change-password">🔐 СМЕНИТЬ ПАРОЛЬ</button>
+                </form>
+            </div>
+            
+            <!-- Right Section: Activity -->
+            <div class="profile-section">
+                <h3>📊 Активность</h3>
+                <div class="activity-text">
+                    <strong>Подсказки по поиску:</strong><br>
+                    Для получения уведомлений о новых данных настройте соответствующие параметры в системе.
+                    <br><br>
+                    <strong>Последний вход:</strong><br>
+                    <span id="lastLogin">-</span>
+                    <br><br>
+                    <strong>Всего партий:</strong><br>
+                    <span id="totalBatches">0</span>
+                    <br><br>
+                    <button id="clearCacheBtn" style="background:#667eea;color:#fff;padding:10px 18px;border:none;border-radius:6px;font-weight:600;cursor:pointer;margin-top:10px;">🧹 Очистить кэш</button>
+                    <div id="cacheClearMsg" style="margin-top:8px;color:#388e3c;font-size:14px;display:none;">Кэш очищен!</div>
+                </div>
+            </div>
+        <script>
+        // Keshni tozalash tugmasi uchun
+        document.addEventListener('DOMContentLoaded', function() {
+            var clearBtn = document.getElementById('clearCacheBtn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    try {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        document.cookie.split(';').forEach(function(c) {
+                            document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+                        });
+                        var msg = document.getElementById('cacheClearMsg');
+                        if (msg) {
+                            msg.style.display = 'block';
+                            setTimeout(function(){ msg.style.display = 'none'; }, 2000);
+                        }
+                    } catch (e) {
+                        alert('Ошибка при очистке кэша!');
+                    }
+                });
+            }
+        });
+        </script>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Add Batch Modal -->
+        <div id="adminSection" class="modal">
+            <div class="modal-content" style="max-width: 650px; width: 100%; display: block; padding: 18px 36px 40px 36px; position: relative;">
+                                <button class="btn-close-modal" id="closeAddBatchModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #333; font-size: 28px; cursor: pointer;">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                <h2 style="margin-top: 0; margin-bottom: 22px;">➕ Добавить новую партию</h2>
+                <div id="addAlert"></div>
+                <form id="addBatchForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="productName" placeholder="Кабель" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                            <label for="productName">Название товара *</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="batchCode" placeholder="P-2025-001" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                            <label for="batchCode">Код партии *</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="number" id="quantity_sht" placeholder="Количество (шт)" min="0" style="width:100%;" autocomplete="off" inputmode="numeric">
+                            <label for="quantity_sht">Количество (шт)</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="quantity_kg" placeholder="Количество (кг)" min="0" step="any" style="width:100%;" autocomplete="off" inputmode="decimal">
+                            <label for="quantity_kg">Количество (кг)</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="location" placeholder="A-1-1" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                            <label for="location">Ячейка (формат A-1-1) *</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="comment" placeholder="Комментарий" style="width:100%;" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                            <label for="comment">Комментарий</label>
+                        </div>
+                    </div>
+                    <button type="submit">✅ Сохранить</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Search & Add Section -->
+        <div class="section">
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <div style="max-width: 380px; flex: 1;">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Поиск по коду партии, товару или месту..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="height: 34px; font-size: 13px;">
+                    </div>
+                </div>
+                
+                <button id="requestBtn" class="add-btn" style="background: #5b9bd5; margin-left: auto;">
+                    <span>📣</span>
+                    <span>Запрос</span>
+                </button>
+                <button id="requestsListBtn" class="add-btn" style="background: #4caf50;">
+                    <span>📥</span>
+                    <span>Запросы</span>
+                </button>
+                <button id="requestsDoneBtn" class="add-btn" style="background: #2e7d32;">
+                    <span>✅</span>
+                    <span>Выполненные</span>
+                </button>
+                <button id="archiveBtn" class="add-btn" style="background: #ff9800;">
+                    <span>📁</span>
+                    <span>Архив</span>
+                </button>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button id="addFormBtn" class="add-btn" style="display: none;">
+                        <span>+</span>
+                        <span>Добавить</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Batches List -->
+                <div class="section">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                            <h2>📦 Список партий</h2>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span id="totalInfo" style="font-size: 16px; font-weight: normal; background: #fff; border: 1px solid #dedede; border-radius: 6px; padding: 4px 18px; margin-left: 10px;"></span>
+                                <button id="showMatrixBtn" style="background: #bdbdbd; color: #222; border: none; padding: 2px 6px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; height: 36px; min-width: 36px; min-height: 36px; width: 36px; justify-content: center;">
+                                    <span style="width: 28px; height: 28px; background: none; border-radius: 0; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0;">
+                                        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="4" y="4" width="24" height="24" stroke="#222" stroke-width="3" stroke-dasharray="6,4" fill="none"/>
+                                            <line x1="16" y1="4" x2="16" y2="28" stroke="#222" stroke-width="3" stroke-dasharray="6,4"/>
+                                            <line x1="4" y1="16" x2="28" y2="16" stroke="#222" stroke-width="3" stroke-dasharray="6,4"/>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="batchesAlert"></div>
+                        <div id="batchesList"></div>
+                        <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top: 18px;">
+                            <label for="pageSizeSelect" style="font-size:14px; color:#555; font-weight:700;">строк на страницу</label>
+                            <select id="pageSizeSelect" style="padding:6px 10px; border:1px solid #dedede; border-radius:6px; font-size:14px;">
+                                <option value="7">7</option>
+                                <option value="14">14</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+                        <div id="pagination" style="display: flex; gap: 6px; margin-top: 12px; justify-content: center;"></div>
+                        <div id="emptyState" class="empty-state" style="display: none;">
+                            📭 Партий пока нет
+                        </div>
+                </div>
+                <div id="matrixModal" class="modal">
+                        <div class="modal-content" style="max-width: 820px; width: 100%; display: block; position: relative; padding: 48px 60px 48px 60px; border-radius: 16px; background: #fff; box-shadow: 0 8px 40px #ffe60033, 0 2px 16px #00000014;">
+                            <button class="btn-close-modal" id="closeMatrixModal" style="position: absolute; top: 18px; right: 24px; background: none; border: none; color: #333; font-size: 34px; cursor: pointer;">✕</button>
+                            <h2 style="margin-bottom: 24px; font-size: 1.45rem; font-weight: 700; color: #222; text-align: left;">Состояние рядов</h2>
+                            <div id="rowsMatrix" style="margin: 24px 0; border: 4px solid #ffe600; border-radius: 12px; padding: 24px 0 24px 0; display: flex; justify-content: center; align-items: center; background: #fff; box-shadow: 0 4px 24px #ffe60022;">
+                                <div style="display: flex; flex-direction: column; align-items: center; min-width: 640px; min-height: 440px; background: #f1f1ee; border-radius: 22px; box-shadow: 0 2px 16px #ffe60033; padding: 36px 32px;">
+                                    <button id="downloadMatrixPdfBtn" style="margin-bottom: 18px; background: #ffe600; color: #222; font-weight: bold; border: none; border-radius: 6px; padding: 8px 22px; font-size: 18px; cursor: pointer;">Скачать PDF</button>
+                                    <table id="matrixAll" style="border-collapse: collapse; font-size: 24px; background: #f5f4f1; border-radius: 16px;">
+                                    </table>
+                                </div>
+                                <!-- jsPDF va html2canvas kutubxonalari -->
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+                                    <script>
+                                    // Matrix modalidagi PDF yuklab olish tugmasi uchun (jadval to'liq sig'sin)
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const pdfBtn = document.getElementById('downloadMatrixPdfBtn');
+                                        if (pdfBtn) {
+                                            pdfBtn.addEventListener('click', function() {
+                                                const matrixDiv = pdfBtn.parentElement;
+                                                html2canvas(matrixDiv.querySelector('table')).then(function(canvas) {
+                                                    const imgData = canvas.toDataURL('image/png');
+                                                    const pdf = new jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+                                                    const pageWidth = pdf.internal.pageSize.getWidth();
+                                                    const pageHeight = pdf.internal.pageSize.getHeight();
+                                                    const margin = 10;
+                                                    let imgWidth = pageWidth - margin * 2;
+                                                    let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                                                    if (imgHeight > pageHeight - margin * 2) {
+                                                        imgHeight = pageHeight - margin * 2;
+                                                        imgWidth = (canvas.width * imgHeight) / canvas.height;
+                                                    }
+                                                    const imgX = (pageWidth - imgWidth) / 2;
+                                                    const imgY = (pageHeight - imgHeight) / 2;
+                                                    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth, imgHeight);
+                                                    pdf.save('qatorlar_holati.pdf');
+                                                });
+                                            });
+                                        }
+                                    });
+                                    </script>
+                            </div>
+                        </div>
+                </div>
+            <div id="batchesAlert"></div>
+            <div id="batchesList"></div>
+            <div id="pagination" style="display: flex; gap: 6px; margin-top: 18px; justify-content: center;"></div>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                📭 Партий пока нет
+            </div>
+            <!-- Модальное окно состояния рядов -->
+            <div id="rowsStatusModal" class="modal">
+                <div class="modal-content" style="max-width: 500px; width: 100%; display: block; position: relative; padding: 28px 36px 36px 36px;">
+                    <button class="btn-close-modal" id="closeRowsStatusModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #333; font-size: 28px; cursor: pointer;">✕</button>
+                    <h2 style="margin-bottom: 20px;">Состояние рядов</h2>
+                    <div id="rowsStatusList"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Модальное окно списания -->
+        <div id="removeModal" class="modal">
+            <div class="modal-content" style="max-width: 350px; width: 100%; display: block; position: relative;">
+                <button id="closeRemoveModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #333; font-size: 28px; cursor: pointer;">✕</button>
+                <h2 style="margin-bottom: 20px;">→ Списание</h2>
+                <div id="removeModalInfo" style="margin-bottom: 10px;"></div>
+                <form id="removeForm">
+                    <label>Сколько списать (шт)?</label>
+                    <input type="number" id="removeQtyInput" min="1" required style="width: 100%; padding: 8px; margin: 10px 0 10px 0; border-radius: 5px; border: 1px solid #ddd; font-size: 16px;">
+                    <label style="margin-top:10px;">Сколько списать (кг)?</label>
+                    <input type="number" id="removeKgInput" min="0" step="0.01" style="width: 100%; padding: 8px; margin: 10px 0 20px 0; border-radius: 5px; border: 1px solid #ddd; font-size: 16px;">
+                    <button type="submit" class="btn-slide" style="width: 100%;">→ Списание</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Arxiv Modal -->
+        <div id="archiveModal" class="modal">
+            <div class="modal-content" style="max-width: 1200px; width: 96%; display: block; position: relative; font-size: 16px; padding: 24px 28px;">
+                <button class="btn-close-modal" id="closeArchiveModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #333; font-size: 28px; cursor: pointer;">✕</button>
+                <h2 style="margin-bottom: 20px;">📁 Архив</h2>
+                
+                <div style="display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-end; background: #f6f7fb; border: 1px solid #e2e6ef; border-radius: 10px; padding: 14px 16px; flex-wrap: wrap;">
+                    <div>
+                        <label for="archiveStartDate" style="font-weight: 600; color:#444;">Дата с</label>
+                        <input type="date" id="archiveStartDate" style="width: 170px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;" value="">
+                    </div>
+                    <div>
+                        <label for="archiveEndDate" style="font-weight: 600; color:#444;">Дата по</label>
+                        <input type="date" id="archiveEndDate" style="width: 170px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;" value="">
+                    </div>
+                    <div>
+                        <label for="archiveSearch" style="font-weight: 600; color:#444;">Партия или товар</label>
+                        <input type="text" id="archiveSearch" placeholder="Например: KS26-0001" style="width: 260px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;">
+                    </div>
+                    <button id="archiveFilterBtn" style="background: #667eea; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 15px;">Поиск</button>
+                    <button id="archiveExportBtn" style="background: #2d9cdb; color: white; border: none; padding: 10px 22px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 15px;">Excel</button>
+                </div>
+                
+                <div id="archiveResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Request Modal -->
+        <div id="requestModal" class="modal">
+            <div class="modal-content" style="max-width: 520px; width: 100%; display: block; position: relative;">
+                <button class="btn-close-modal" id="closeRequestModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #333; font-size: 28px; cursor: pointer;">✕</button>
+                <h2 style="margin-bottom: 20px;">📣 Запрос на склад</h2>
+                <div id="requestAlert"></div>
+                <form id="requestForm">
+                    <div class="form-group">
+                        <input type="text" id="requestProductName" placeholder="Название товара" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" readonly>
+                        <label for="requestProductName">Название товара *</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="requestBatchCode" placeholder="Код партии" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                        <label for="requestBatchCode">Код партии *</label>
+                        <div id="requestBatchInfo" style="margin-top:6px; font-size:16px; font-weight:600; color:#666;"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="number" id="requestQtySht" placeholder="Количество (шт)" min="0" autocomplete="off" inputmode="numeric">
+                            <label for="requestQtySht">Количество (шт)</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="requestQtyKg" placeholder="Количество (кг)" min="0" step="any" autocomplete="off" inputmode="decimal">
+                            <label for="requestQtyKg">Количество (кг)</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="requestComment" placeholder="Комментарий" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                        <label for="requestComment">Комментарий</label>
+                    </div>
+                    <button type="submit" class="btn-login" style="width: 100%;">📣 Отправить запрос</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Requests List Modal -->
+        <div id="requestsListModal" class="modal">
+            <div class="modal-content" style="max-width: 1300px; width: 97%; display: block; position: relative; font-size: 17px; padding: 24px 28px;">
+                <button class="btn-close-modal" id="closeRequestsListModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #333; font-size: 28px; cursor: pointer;">✕</button>
+                <h2 style="margin-bottom: 20px;">📥 Запросы на склад</h2>
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin: 0 0 10px 0;">
+                    <button id="requestsListPdfBtn" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:10px 14px;cursor:pointer;font-weight:600;">📄 Скачать PDF</button>
+                </div>
+                <div id="requestsList" style="margin-top: 10px; max-height: 360px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- Requests Done Modal -->
+        <div id="requestsDoneModal" class="modal">
+            <div class="modal-content" style="max-width: 1300px; width: 97%; display: block; position: relative; font-size: 17px; padding: 24px 28px;">
+                <button class="btn-close-modal" id="closeRequestsDoneModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #333; font-size: 28px; cursor: pointer;">✕</button>
+                <h2 style="margin-bottom: 20px;">✅ Выполненные запросы</h2>
+                <div style="margin: 0 0 10px 0;">
+                    <input type="text" id="requestsDoneBatchFilter" placeholder="Фильтр по партии" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="width: 320px; max-width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;">
+                </div>
+                <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; margin: 6px 0 6px 0;">
+                    <label for="donePageSizeSelect" style="font-size:14px; color:#555; font-weight:700;">строк на страницу</label>
+                    <select id="donePageSizeSelect" style="padding:6px 10px; border:1px solid #dedede; border-radius:6px; font-size:14px;">
+                        <option value="12">12</option>
+                        <option value="24">24</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div id="requestsDoneList" style="margin-top: 10px; max-height: 520px; overflow-y: auto;"></div>
+                <div id="requestsDonePagination" style="display: flex; gap: 6px; margin-top: 12px; justify-content: center;"></div>
+            </div>
+        </div>
+    </div>
+    
+        <script>
+        // Matritsa qiymatlari va band/bo‘sh holat (demo, backenddan keladi)
+        const matrix = {
+            A: [[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1]],
+            B: [[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1]],
+            C: [[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1],[4,3,2,1]]
+        };
+        // Kataklar holati backenddan keladi
+        let busyCells = {
+          A: Array(9).fill().map(() => Array(4).fill(false)),
+          B: Array(9).fill().map(() => Array(4).fill(false)),
+          C: Array(9).fill().map(() => Array(4).fill(false)),
+        };
+
+            // Katakni band qilish (yangi partiya qo'shilganda)
+            function setCellBusy(location) {
+                // location: "A-1-4"
+                if (!location) return;
+                const [sector, row, cell] = location.split('-');
+                if (busyCells[sector] && busyCells[sector][parseInt(row)-1]) {
+                    busyCells[sector][parseInt(row)-1][parseInt(cell)-1] = true;
+                    renderMatrix();
+                }
+            }
+
+            // Katakni bo'shatish (mahsulot chiqarilganda)
+            function setCellFree(location) {
+                if (!location) return;
+                const [sector, row, cell] = location.split('-');
+                if (busyCells[sector] && busyCells[sector][parseInt(row)-1]) {
+                    busyCells[sector][parseInt(row)-1][parseInt(cell)-1] = false;
+                    renderMatrix();
+                }
+            }
+
+        async function fetchMatrixStatus() {
+            try {
+                const res = await fetch('/api/rows_matrix_status');
+                if (res.ok) {
+                    const data = await res.json();
+                    // 'busy' => true, 'free' => false
+                    for (const sector of ['A','B','C']) {
+                        for (let i = 0; i < 9; i++) {
+                            for (let j = 0; j < 4; j++) {
+                                busyCells[sector][i][j] = (data[sector][i][j] === 'busy');
+                            }
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+        function renderMatrix() {
+            const table = document.querySelector('#rowsMatrix table');
+            // Jadval sarlavhasi
+            table.innerHTML = `
+                <tr>
+                    <th style="background:#f8f8f8;">№</th>
+                    <th colspan="4" style="background:yellow;">A</th>
+                    <th style="background:#f8f8f8;">№</th>
+                    <th colspan="4" style="background:yellow;">B</th>
+                    <th style="background:#f8f8f8;">№</th>
+                    <th colspan="4" style="background:yellow;">C</th>
+                </tr>
+                <tr>
+                    <th style="background:#f8f8f8;"></th>
+                    <th style="background: #eee;">1</th>
+                    <th style="background: #eee;">2</th>
+                    <th style="background: #eee;">3</th>
+                    <th style="background: #eee;">4</th>
+                    <th style="background:#f8f8f8;"></th>
+                    <th style="background: #eee;">1</th>
+                    <th style="background: #eee;">2</th>
+                    <th style="background: #eee;">3</th>
+                    <th style="background: #eee;">4</th>
+                    <th style="background:#f8f8f8;"></th>
+                    <th style="background: #eee;">1</th>
+                    <th style="background: #eee;">2</th>
+                    <th style="background: #eee;">3</th>
+                    <th style="background: #eee;">4</th>
+                </tr>
+            `;
+            for (let i = 0; i < 9; i++) {
+                const tr = document.createElement('tr');
+                // A sektori
+                tr.innerHTML += `<td style='background:#f8f8f8;'>${i+1}</td>`;
+                for (let j = 0; j < 4; j++) {
+                    tr.innerHTML += `<td style=\"background:${busyCells['A'][i][j] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:32px;\">${matrix['A'][i][j]}</td>`;
+                }
+                // B sektori
+                tr.innerHTML += `<td style='background:#f8f8f8;'>${i+1}</td>`;
+                for (let j = 0; j < 4; j++) {
+                    tr.innerHTML += `<td style=\"background:${busyCells['B'][i][j] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:32px;\">${matrix['B'][i][j]}</td>`;
+                }
+                // C sektori
+                tr.innerHTML += `<td style='background:#f8f8f8;'>${i+1}</td>`;
+                for (let j = 0; j < 4; j++) {
+                    tr.innerHTML += `<td style=\"background:${busyCells['C'][i][j] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:32px;\">${matrix['C'][i][j]}</td>`;
+                }
+                table.appendChild(tr);
+            }
+        }
+        // Modal ochish va yopish
+        document.addEventListener('DOMContentLoaded', function() {
+            const showMatrixBtn = document.getElementById('showMatrixBtn');
+            const matrixModal = document.getElementById('matrixModal');
+            const closeMatrixModal = document.getElementById('closeMatrixModal');
+            showMatrixBtn.addEventListener('click', async function() {
+                await fetchMatrixStatus();
+                renderMatrix();
+                matrixModal.classList.add('show');
+            });
+            closeMatrixModal.addEventListener('click', function() {
+                matrixModal.classList.remove('show');
+            });
+            window.addEventListener('click', function(e) {
+                if (e.target === matrixModal) {
+                    matrixModal.classList.remove('show');
+                }
+            });
+        });
+        // Qatorlar holati uchun demo ma'lumot (backenddan keladi)
+
+        let rowsStatus = [];
+
+        async function fetchRowsStatus() {
+            try {
+                const response = await fetch('/api/rows_status');
+                if (!response.ok) throw new Error('Serverdan xato javob');
+                rowsStatus = await response.json();
+            } catch (e) {
+                rowsStatus = [];
+            }
+        }
+
+        // Modalni ochish
+        document.addEventListener('DOMContentLoaded', function() {
+            const showRowsStatusBtn = document.getElementById('showRowsStatusBtn');
+            const rowsStatusModal = document.getElementById('rowsStatusModal');
+            const closeRowsStatusModal = document.getElementById('closeRowsStatusModal');
+            showRowsStatusBtn.addEventListener('click', async function() {
+                await fetchRowsStatus();
+                renderRowsStatus();
+                rowsStatusModal.classList.add('show');
+            });
+            closeRowsStatusModal.addEventListener('click', function() {
+                rowsStatusModal.classList.remove('show');
+            });
+            window.addEventListener('click', function(e) {
+                if (e.target === rowsStatusModal) {
+                    rowsStatusModal.classList.remove('show');
+                }
+            });
+        });
+
+        // Qatorlar holatini chizish
+        function renderMatrix() {
+            // 1. Barcha kataklarni bo'sh deb belgila
+            busyCells = {
+                A: Array(9).fill().map(() => Array(4).fill(false)),
+                B: Array(9).fill().map(() => Array(4).fill(false)),
+                C: Array(9).fill().map(() => Array(4).fill(false)),
+            };
+            // 2. Barcha partiyalarni (allBatches) ko'rib chiqib, band kataklarni belgila
+            if (window.allBatches && Array.isArray(window.allBatches)) {
+                window.allBatches.forEach(batch => {
+                    if (batch.location) {
+                        const match = batch.location.match(/([ABC])-([1-9])-([1-4])/);
+                        if (match) {
+                            const sector = match[1];
+                            const row = parseInt(match[2], 10) - 1;
+                            const col = parseInt(match[3], 10) - 1;
+                            busyCells[sector][row][col] = true;
+                        }
+                    }
+                });
+            }
+            const table = document.getElementById('matrixAll');
+            let html = '';
+            // 1-qator: sektor sarlavhalari (A, B, C) faqat
+            html += `<tr>`;
+            html += `<th style='background:#f8f8f8; min-width: 36px; min-height: 36px; padding: 10px 12px; font-size: 22px; border-top-left-radius: 18px;'>№</th>`;
+            for (let s = 0; s < 3; s++) {
+                if (s > 0) html += `<th style='min-width: 18px; background: #fffde7; border: none;'></th>`;
+                html += `<th colspan='4' style='background: #ffe600; color: #222; font-weight: 700; font-size: 22px; padding: 10px 0; border-radius: 0 0 0 0;'>${String.fromCharCode(65 + s)}</th>`;
+            }
+            html += `</tr>`;
+            // 3-11 qatorlar: qiymatlar
+            for (let i = 0; i < 9; i++) {
+                html += `<tr>`;
+                html += `<td style='background:#f8f8f8; min-width: 36px; min-height: 36px; padding: 10px 12px; font-size: 22px; text-align: center;'>${i + 1}</td>`;
+                for (let s = 0; s < 3; s++) {
+                    if (s > 0) html += `<td style='min-width: 18px; background: #fffde7; border: none;'></td>`;
+                    for (let n = 0; n < 4; n++) {
+                        // 1 2 3 4 chapdan o'ngga
+                        const colIdx = n;
+                        html += `<td style=\"background:${busyCells[String.fromCharCode(65+s)][i][colIdx] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:36px;min-height:36px;padding:10px 18px;font-size:22px; border-left:2px solid #fff; border-right:2px solid #fff; border-top: 1.5px solid #fff; border-bottom: 1.5px solid #fff;\">${colIdx+1}</td>`;
+                    }
+                }
+                html += `</tr>`;
+            }
+            table.innerHTML = html;
+                                        function renderSectorMatrix(sectorName, sectorMatrix, sectorBusy, containerId) {
+                                            const container = document.getElementById(containerId);
+                                            let html = `<table style=\"border-collapse: collapse; font-size: 16px;\">`;
+                                            html += `<tr><th style='background:#f8f8f8; min-width: 22px; min-height: 22px; padding: 2px 6px; font-size: 16px;'>№</th><th colspan='4' style='background:yellow; min-width: 88px; min-height: 22px; font-size: 16px; padding: 2px 6px;'>${sectorName}</th></tr>`;
+                                            html += `<tr><th style='background:#f8f8f8; min-width: 22px; min-height: 22px; padding: 2px 6px; font-size: 16px;'></th>`;
+                                            for (let j = 0; j < 4; j++) {
+                                                html += `<th style='background:#eee; min-width: 22px; min-height: 22px; padding: 2px 6px; font-size: 16px;'>${j+1}</th>`;
+                                            }
+                                            html += `</tr>`;
+                                            for (let i = 0; i < 9; i++) {
+                                                html += `<tr>`;
+                                                html += `<td style='background:#f8f8f8; min-width: 22px; min-height: 22px; padding: 2px 6px; font-size: 16px;'>${i+1}</td>`;
+                                                for (let j = 0; j < 4; j++) {
+                                                    html += `<td style=\"background:${sectorBusy[i][j] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:22px;min-height:22px;padding:2px 6px;font-size:16px;\">${sectorMatrix[i][j]}</td>`;
+                                                }
+                                                html += `</tr>`;
+                                            }
+                                            html += `</table>`;
+                                            container.innerHTML = html;
+                                        }
+                                function renderSectorMatrix(sectorName, sectorMatrix, sectorBusy, containerId) {
+                                    const container = document.getElementById(containerId);
+                                    let html = `<table style="border-collapse: collapse; font-size: 28px;">`;
+                                    html += `<tr><th style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>№</th><th colspan='4' style='background:yellow; min-width: 192px; min-height: 48px; font-size: 28px; padding: 12px;'>${sectorName}</th></tr>`;
+                                    html += `<tr><th style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'></th>`;
+                                    for (let j = 0; j < 4; j++) {
+                                        html += `<th style='background:#eee; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>${j+1}</th>`;
+                                    }
+                                    html += `</tr>`;
+                                    for (let i = 0; i < 9; i++) {
+                                        html += `<tr>`;
+                                        html += `<td style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>${i+1}</td>`;
+                                        for (let j = 0; j < 4; j++) {
+                                            html += `<td style="background:${sectorBusy[i][j] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:48px;min-height:48px;padding:12px;font-size:28px;">${sectorMatrix[i][j]}</td>`;
+                                        }
+                                        html += `</tr>`;
+                                    }
+                                    html += `</table>`;
+                                    container.innerHTML = html;
+                                }
+                        function renderSectorMatrix(sectorName, sectorMatrix, sectorBusy, containerId) {
+                            const container = document.getElementById(containerId);
+                            let html = `<table style="border-collapse: collapse; font-size: 28px;">`;
+                            html += `<tr><th style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>№</th><th colspan='4' style='background:yellow; min-width: 192px; min-height: 48px; font-size: 28px; padding: 12px;'>${sectorName}</th></tr>`;
+                            html += `<tr><th style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'></th>`;
+                            for (let j = 0; j < 4; j++) {
+                                html += `<th style='background:#eee; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>${j+1}</th>`;
+                            }
+                            html += `</tr>`;
+                            for (let i = 0; i < 9; i++) {
+                                html += `<tr>`;
+                                html += `<td style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>${i+1}</td>`;
+                                for (let j = 0; j < 4; j++) {
+                                    html += `<td style="background:${sectorBusy[i][j] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:48px;min-height:48px;padding:12px;font-size:28px;">${sectorMatrix[i][j]}</td>`;
+                                }
+                                html += `</tr>`;
+                            }
+                            html += `</table>`;
+                            container.innerHTML = html;
+                        }
+                function renderSectorMatrix(sectorName, sectorMatrix, sectorBusy, containerId) {
+                    const container = document.getElementById(containerId);
+                    let html = `<table style=\"border-collapse: collapse; font-size: 28px;\">`;
+                    html += `<tr><th style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>№</th><th colspan='4' style='background:yellow; min-width: 192px; min-height: 48px; font-size: 28px; padding: 12px;'>${sectorName}</th></tr>`;
+                    html += `<tr><th style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'></th>`;
+                    for (let j = 0; j < 4; j++) {
+                        html += `<th style='background:#eee; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>${j+1}</th>`;
+                    }
+                    html += `</tr>`;
+                    for (let i = 0; i < 9; i++) {
+                        html += `<tr>`;
+                        html += `<td style='background:#f8f8f8; min-width: 48px; min-height: 48px; padding: 12px; font-size: 28px;'>${i+1}</td>`;
+                        for (let j = 0; j < 4; j++) {
+                            html += `<td style=\"background:${sectorBusy[i][j] ? '#e04a6a' : '#27ae60'};color:#fff;text-align:center;font-weight:bold;min-width:48px;min-height:48px;padding:12px;font-size:28px;\">${sectorMatrix[i][j]}</td>`;
+                        }
+                        html += `</tr>`;
+                    }
+                    html += `</table>`;
+                    container.innerHTML = html;
+                }
+        }
+
+        // endi kerak emas
+        // let currentRole = '';
+        let allBatches = [];
+        let currentPage = 1;
+        let pageSize = 7;
+
+        // ==================== FETCH WITH AUTH ====================
+        async function fetchWithAuth(url, options) {
+            try {
+                const response = await fetch(url, options);
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '/login';
+                    return null;
+                }
+                // Agar JSON emas, HTML qaytsa, xabar ko'rsatish
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    showAlert && showAlert('batchesAlert', '❌ Ошибка: неверный ответ сервера или сессия завершена!', 'error');
+                    return null;
+                }
+                return response;
+            } catch (err) {
+                showAlert && showAlert('batchesAlert', '❌ Ошибка: ' + err.message, 'error');
+                return null;
+            }
+        }
+
+        // ==================== INIT ====================
+        window.addEventListener('load', async () => {
+            await loadUser();
+            await loadBatches();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pageSizeSelect = document.getElementById('pageSizeSelect');
+            if (pageSizeSelect) {
+                pageSizeSelect.value = String(pageSize);
+                pageSizeSelect.addEventListener('change', () => {
+                    const newSize = parseInt(pageSizeSelect.value, 10);
+                    pageSize = Number.isNaN(newSize) ? 7 : newSize;
+                    currentPage = 1;
+                    if (searchMode) {
+                        fetchAndRenderSearch();
+                    } else {
+                        renderBatchesPage();
+                    }
+                });
+            }
+
+            const donePageSizeSelect = document.getElementById('donePageSizeSelect');
+            if (donePageSizeSelect) {
+                donePageSizeSelect.value = String(donePageSize);
+                donePageSizeSelect.addEventListener('change', () => {
+                    const newSize = parseInt(donePageSizeSelect.value, 10);
+                    donePageSize = Number.isNaN(newSize) ? 12 : newSize;
+                    doneCurrentPage = 1;
+                    renderDoneRequests(doneFilteredCache, 'Выполненных запросов нет');
+                });
+            }
+        });
+        
+        // ==================== USER INFO ====================
+        async function loadUser() {
+            try {
+                const response = await fetchWithAuth('/api/user');
+                if (!response) return;
+                const user = await response.json();
+
+                document.getElementById('username').textContent = user.username;
+                // document.getElementById('role').textContent = user.role === 'admin' ? '🔑 ADMIN' : '👁 KO\'RUVCHI';
+                // currentRole = user.role;
+
+                // Profile button opens profile modal directly
+                const profileBtn = document.getElementById('profileBtn');
+                profileBtn.addEventListener('click', () => {
+                    showProfile(user);
+                });
+
+                document.addEventListener('click', (e) => {
+                    // Modal yopish uchun overlay-ga bosish
+                    if (e.target.id === 'profileModal') {
+                        closeProfileModal();
+                    }
+                });
+                // Password form submit
+                const passwordForm = document.getElementById('changePasswordForm');
+                if (passwordForm) {
+                    passwordForm.addEventListener('submit', changePassword);
+                }
+
+                document.getElementById('addFormBtn').style.display = 'flex';
+                document.getElementById('addBatchForm').addEventListener('submit', addBatch);
+                // Modalni ochish va yopish
+                const adminSection = document.getElementById('adminSection');
+                const addFormBtn = document.getElementById('addFormBtn');
+                const closeAddBatchModal = document.getElementById('closeAddBatchModal');
+                addFormBtn.addEventListener('click', () => {
+                    adminSection.classList.add('show');
+                });
+                // Modal va overlayni yopish funksiyasi
+                function closeAdminModal() {
+                    adminSection.classList.remove('show');
+                    const overlay = document.getElementById('overlay');
+                    if (overlay) overlay.classList.remove('show');
+                }
+                if (closeAddBatchModal) {
+                    closeAddBatchModal.onclick = closeAdminModal;
+                }
+                const overlay = document.getElementById('overlay');
+                if (overlay) {
+                    overlay.addEventListener('click', closeAdminModal);
+                }
+                window.addEventListener('click', (e) => {
+                    if (e.target === adminSection) {
+                        adminSection.classList.remove('show');
+                    }
+                });
+            } catch (error) {
+                console.error('User load error:', error);
+            }
+        }
+        
+        // ==================== SHOW PROFILE ====================
+        function showProfile(user) {
+            const modal = document.getElementById('profileModal');
+            
+            if (!modal) {
+                console.error('Modal topilmadi!');
+                return;
+            }
+            
+            // Fill user info
+            document.getElementById('userFullName').textContent = user.username;
+            document.getElementById('userEmail').textContent = 'user@sklad.uz';
+            document.getElementById('userFirstName').textContent = user.username.charAt(0).toUpperCase() + user.username.slice(1);
+            // document.getElementById('userLastName').textContent = user.role === 'admin' ? '🔑 ADMIN' : '👁 KO\'RUVCHI';
+            
+            // Fetch activity
+            fetchActivity();
+            
+            // Show modal
+            modal.classList.add('show');
+            console.log('Modal ochildi');
+        }
+        
+        // ==================== FETCH ACTIVITY ====================
+        async function fetchActivity() {
+            try {
+                const response = await fetchWithAuth('/api/user/activity');
+                if (!response) return;
+                const data = await response.json();
+
+                document.getElementById('lastLogin').textContent = data.last_active;
+                document.getElementById('totalBatches').textContent = data.total_batches;
+            } catch (error) {
+                console.error('Activity fetch error:', error);
+            }
+        }
+        
+        function closeProfileModal() {
+            const modal = document.getElementById('profileModal');
+            modal.classList.remove('show');
+        }
+        
+        // ==================== CHANGE PASSWORD ====================
+        async function changePassword(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validation
+            if (!currentPassword) {
+                showAlert('batchesAlert', '❌ Joriy parolni kiriting', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 5) {
+                showAlert('batchesAlert', '❌ Parol kamida 5 ta belgi bo\'lishi kerak', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showAlert('batchesAlert', '❌ Yangi parollar mos kelmaydi', 'error');
+                return;
+            }
+            
+            if (currentPassword === newPassword) {
+                showAlert('batchesAlert', '❌ Yangi parol eski parol bilan bir xil bo\'lmasligi kerak', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/user/password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('batchesAlert', '✅ ' + result.message, 'success');
+                    document.getElementById('changePasswordForm').reset();
+                    setTimeout(() => {
+                        closeProfileModal();
+                    }, 2000);
+                } else {
+                    showAlert('batchesAlert', '❌ ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('batchesAlert', '❌ Ошибка: ' + error.message, 'error');
+            }
+        }
+        
+        // ==================== FORM TOGGLE ====================
+        function setupFormToggle() {
+            // Endi kerak emas
+        }
+        
+        // ==================== LOAD BATCHES ====================
+        async function loadBatches() {
+            try {
+                const response = await fetchWithAuth('/api/batches');
+                if (!response) return;
+                if (!response.ok) {
+                    const text = await response.text();
+                    showAlert('batchesAlert', 'Ошибка: ' + text, 'error');
+                    return;
+                }
+                allBatches = await response.json();
+                window.allBatches = allBatches;
+                currentPage = 1;
+                renderBatchesPage();
+            } catch (error) {
+                showAlert('batchesAlert', 'Ошибка: ' + error.message, 'error');
+            }
+        }
+        
+        // ==================== RENDER BATCHES ====================
+        // ==================== PAGINATION & SEARCH STATE ====================
+        let searchMode = false;
+        let searchQuery = '';
+        let searchTotal = 0;
+        let searchResults = [];
+
+        function renderBatchesPage(customBatches, customTotal) {
+            let batches, total;
+            if (searchMode && typeof customBatches !== 'undefined') {
+                batches = customBatches.filter(batch => (batch.quantity_sht || 0) > 0 || (batch.quantity_kg || 0) > 0);
+                total = typeof customTotal === 'number' ? customTotal : searchTotal;
+            } else if (Array.isArray(customBatches)) {
+                batches = customBatches.filter(batch => (batch.quantity_sht || 0) > 0 || (batch.quantity_kg || 0) > 0);
+                total = batches.length;
+            } else {
+                batches = allBatches.filter(batch => (batch.quantity_sht || 0) > 0 || (batch.quantity_kg || 0) > 0);
+                total = batches.length;
+            }
+            const container = document.getElementById('batchesList');
+            const emptyState = document.getElementById('emptyState');
+            const pagination = document.getElementById('pagination');
+            // Umumiy sht va kg hisoblash
+            let totalSht = 0;
+            let totalKg = 0;
+            batches.forEach(batch => {
+                totalSht += batch.quantity_sht || 0;
+                totalKg += batch.quantity_kg || 0;
+            });
+            // Sarlavha yoniga chiqarish
+            let totalInfo = document.getElementById('totalInfo');
+            const header = Array.from(document.querySelectorAll('.section h2')).find(h2 => h2.textContent.includes("Список партий"));
+            if (header) {
+                if (!totalInfo) {
+                    totalInfo = document.createElement('span');
+                    totalInfo.id = 'totalInfo';
+                    totalInfo.style.float = 'right';
+                    totalInfo.style.fontSize = '16px';
+                    totalInfo.style.fontWeight = 'normal';
+                    totalInfo.style.background = '#fff';
+                    totalInfo.style.border = '1px solid #dedede';
+                    totalInfo.style.borderRadius = '6px';
+                    totalInfo.style.padding = '4px 18px';
+                    totalInfo.style.marginRight = '10px';
+                    header.appendChild(totalInfo);
+                }
+                totalInfo.innerHTML = `<b>Общее количество:</b> ${totalSht} шт / ${totalKg} кг`;
+            }
+            if (batches.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                totalInfo.innerHTML = `<b>Общее количество:</b> 0 шт / 0 кг`;
+                pagination.innerHTML = '';
+                return;
+            }
+            emptyState.style.display = 'none';
+            // Sahifalash
+            const totalPages = Math.ceil(total / pageSize);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+            // Agar searchMode bo'lsa, backenddan kelgan natijani ko'rsatamiz, aks holda localdan bo'lamiz
+            let pageBatches = batches;
+            if (!searchMode) {
+                const start = (currentPage - 1) * pageSize;
+                const end = start + pageSize;
+                pageBatches = batches.slice(start, end);
+            }
+            container.innerHTML = pageBatches.map(batch => {
+                const maxQty = batch.quantity_sht || 0;
+                const maxKg = batch.quantity_kg || 0;
+                const comment = batch.comment ? `<div class='batch-comment'><strong>Комментарий:</strong> ${batch.comment}</div>` : '';
+                return `
+                <div class="batch-item" data-id="${batch.id}">
+                    <div class="batch-content">
+                        <div class="batch-title">${batch.product_name}</div>
+                        <div class="batch-meta">
+                            <span><strong>Партия:</strong> ${batch.batch_code}</span>
+                            <span><strong>Количество (шт):</strong> ${maxQty}</span>
+                            <span><strong>Количество (кг):</strong> ${maxKg}</span>
+                            <span><strong>Ячейка:</strong> ${batch.location}</span>
+                        </div>
+                        ${comment}
+                    </div>
+                    <div class="batch-actions">
+                        <button class="btn-slide" onclick="openRemoveModal(${batch.id}, '${batch.product_name.replace(/'/g, '\'')}', '${batch.batch_code}', ${maxQty}, ${maxKg})"><svg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle;'><rect width='24' height='24' fill='none'/><path d='M7 12h10M13 8l4 4-4 4' stroke='#fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg></button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            // Sahifa tugmalari
+            let pagHtml = '';
+            if (totalPages > 1) {
+                // Pagination in groups of 10
+                let groupSize = 10;
+                let currentGroup = Math.floor((currentPage - 1) / groupSize);
+                let startPage = currentGroup * groupSize + 1;
+                let endPage = Math.min(startPage + groupSize - 1, totalPages);
+                // Left arrow
+                if (startPage > 1) {
+                    pagHtml += `<button onclick="gotoPage(${startPage - 1}, ${searchMode})" style="padding: 4px 10px; margin: 0 2px; border-radius: 4px; border: 1px solid #dedede; background: #fff; color: #333; font-weight: normal; cursor:pointer;">&#8592;</button>`;
+                }
+                // Page buttons
+                for (let i = startPage; i <= endPage; i++) {
+                    pagHtml += `<button onclick="gotoPage(${i}, ${searchMode})" style="padding: 4px 10px; margin: 0 2px; border-radius: 4px; border: 1px solid #dedede; background: ${i === currentPage ? '#e04a6a' : '#fff'}; color: ${i === currentPage ? '#fff' : '#333'}; font-weight: ${i === currentPage ? 'bold' : 'normal'}; cursor:pointer;">${i}</button>`;
+                }
+                // Right arrow
+                if (endPage < totalPages) {
+                    pagHtml += `<button onclick="gotoPage(${endPage + 1}, ${searchMode})" style="padding: 4px 10px; margin: 0 2px; border-radius: 4px; border: 1px solid #dedede; background: #fff; color: #333; font-weight: normal; cursor:pointer;">&#8594;</button>`;
+                }
+            }
+            pagination.innerHTML = pagHtml;
+        }
+
+        function gotoPage(page) {
+            currentPage = page;
+            renderBatchesPage();
+        }
+        
+        // ==================== ADD BATCH ====================
+        async function addBatch(e) {
+            e.preventDefault();
+
+            const data = {
+                product_name: document.getElementById('productName').value,
+                batch_code: document.getElementById('batchCode').value,
+                quantity_sht: parseInt(document.getElementById('quantity_sht').value) || 0,
+                quantity_kg: parseFloat(document.getElementById('quantity_kg').value) || 0,
+                location: document.getElementById('location').value,
+                comment: document.getElementById('comment').value || ''
+            };
+
+            try {
+                const response = await fetchWithAuth('/api/batches', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!response) return;
+                let result = null;
+                try {
+                    result = await response.json();
+                } catch (jsonErr) {
+                    // JSON emas (masalan, HTML) bo'lsa, foydalanuvchiga xato yozuvini ko'rsatamiz
+                    showAlert('addAlert', '❌ Ошибка: неверный ответ сервера или сессия завершена!', 'error');
+                    return;
+                }
+                if (response.ok) {
+                    showAlert('addAlert', '✅ Партия успешно добавлена!', 'success');
+                    document.getElementById('addBatchForm').reset();
+                    document.getElementById('adminSection').classList.remove('show');
+                    document.getElementById('overlay').classList.remove('show');
+                        // Katakni band qilish (qizil qilish)
+                        setCellBusy(data.location);
+                    setTimeout(loadBatches, 500);
+                } else {
+                    showAlert('addAlert', '❌ Ошибка: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('addAlert', '❌ Ошибка: ' + error.message, 'error');
+            }
+        }
+        
+        // ==================== REMOVE BATCH (SLIDE) ====================
+        // Modal orqali chiqarish
+        let removeModalBatchId = null;
+        let removeModalMaxQty = 1;
+        window.removeModalMaxKg = 0;
+        function openRemoveModal(batchId, productName, batchCode, maxQty, maxKg) {
+            removeModalBatchId = batchId;
+            removeModalMaxQty = maxQty;
+            window.removeModalMaxKg = maxKg;
+            document.getElementById('removeModalInfo').innerHTML = `<b>${productName}</b> (<b>Код:</b> ${batchCode})<br><b>В наличии:</b> ${maxQty} шт<br><b>В наличии:</b> ${maxKg} кг`;
+            const qtyInput = document.getElementById('removeQtyInput');
+            qtyInput.value = '';
+            qtyInput.max = maxQty;
+            qtyInput.min = 0;
+            const kgInput = document.getElementById('removeKgInput');
+            kgInput.value = '';
+            kgInput.max = maxKg;
+            kgInput.min = 0;
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.add('show');
+            document.getElementById('removeModal').classList.add('show');
+        }
+        document.getElementById('closeRemoveModal').onclick = function() {
+            document.getElementById('removeModal').classList.remove('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.remove('show');
+        };
+        // Overlay and modal close logic for remove modal
+        const overlay = document.getElementById('overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                document.getElementById('removeModal').classList.remove('show');
+                overlay.classList.remove('show');
+            });
+        }
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('removeModal');
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                const overlay = document.getElementById('overlay');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+        document.getElementById('removeForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const qtySht = parseInt(document.getElementById('removeQtyInput').value) || 0;
+            const qtyKg = parseFloat(document.getElementById('removeKgInput').value) || 0;
+            if (qtySht < 0 || qtySht > removeModalMaxQty) {
+                showAlert('batchesAlert', `❌ Введите корректное количество (0-${removeModalMaxQty})`, 'error');
+                return;
+            }
+            if (qtyKg < 0 || qtyKg > window.removeModalMaxKg) {
+                showAlert('batchesAlert', `❌ Введите корректный вес (0-${window.removeModalMaxKg})`, 'error');
+                return;
+            }
+            if (qtySht === 0 && qtyKg === 0) {
+                showAlert('batchesAlert', '❌ Введите хотя бы одно значение', 'error');
+                return;
+            }
+            const item = document.querySelector(`[data-id="${removeModalBatchId}"]`);
+            item.classList.add('sliding');
+            document.getElementById('removeModal').classList.remove('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.remove('show');
+            setTimeout(async () => {
+                try {
+                    const response = await fetchWithAuth(`/api/batches/${removeModalBatchId}/remove`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ quantity_sht: qtySht, quantity_kg: qtyKg })
+                    });
+                    if (!response) {
+                        item.classList.remove('sliding');
+                        return;
+                    }
+                    if (response.ok) {
+                        const result = await response.json();
+                        showAlert('batchesAlert', '✅ Партия списана', 'success');
+                        
+                        // If logout is required, redirect to login
+                        if (result.logout) {
+                            setTimeout(() => {
+                                window.location.href = '/login';
+                            }, 1500);
+                            return;
+                        }
+                        
+                            // Agar butunlay chiqarilsa, katakni bo'shatish (yashil qilish)
+                            if ((qtySht === removeModalMaxQty || removeModalMaxQty === 0) && (qtyKg === window.removeModalMaxKg || window.removeModalMaxKg === 0)) {
+                                // batch obyektidan location olish kerak, uni backenddan qaytarish yoki oldindan saqlash mumkin
+                                // Bu yerda soddaroq variant: batch obyektidan location olish uchun allBatches dan topamiz
+                                const batch = allBatches.find(b => b.id === removeModalBatchId);
+                                if (batch && batch.location) {
+                                    setCellFree(batch.location);
+                                }
+                            }
+                        setTimeout(loadBatches, 500);
+                    } else {
+                        let result = {};
+                        try {
+                            result = await response.json();
+                        } catch (err) {}
+                        showAlert('batchesAlert', '❌ Ошибка! ' + (result.error || ''), 'error');
+                        item.classList.remove('sliding');
+                    }
+                } catch (error) {
+                    showAlert('batchesAlert', '❌ Ошибка: ' + error.message, 'error');
+                    item.classList.remove('sliding');
+                }
+            }, 300);
+        };
+        
+        // ==================== SEARCH ====================
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
+            const query = e.target.value.trim();
+            searchQuery = query;
+            if (!query) {
+                searchMode = false;
+                currentPage = 1;
+                renderBatchesPage();
+                return;
+            }
+            searchMode = true;
+            currentPage = 1;
+            await fetchAndRenderSearch();
+        });
+        
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query) {
+                    searchQuery = query;
+                    searchMode = true;
+                    currentPage = 1;
+                    await fetchAndRenderSearch();
+                }
+            }
+        });
+
+        async function fetchAndRenderSearch() {
+            const response = await fetchWithAuth(`/api/batches/search?q=${encodeURIComponent(searchQuery)}&page=${currentPage}&page_size=${pageSize}`);
+            if (!response) return;
+            const data = await response.json();
+            searchResults = data.results || [];
+            searchTotal = data.total || 0;
+            renderBatchesPage(searchResults, searchTotal);
+        }
+
+        function gotoPage(page, isSearch) {
+            currentPage = page;
+            if (searchMode) {
+                fetchAndRenderSearch();
+            } else {
+                renderBatchesPage();
+            }
+        }
+        
+        // ==================== ARCHIVE MODAL ====================
+        document.getElementById('archiveBtn').addEventListener('click', function() {
+            const archiveModal = document.getElementById('archiveModal');
+            archiveModal.classList.add('show');
+            const startInput = document.getElementById('archiveStartDate');
+            const endInput = document.getElementById('archiveEndDate');
+            if (startInput) startInput.value = '';
+            if (endInput) endInput.value = '';
+        });
+
+        
+        document.getElementById('closeArchiveModal').addEventListener('click', function() {
+            document.getElementById('archiveModal').classList.remove('show');
+        });
+        
+        window.addEventListener('click', function(e) {
+            const archiveModal = document.getElementById('archiveModal');
+            if (e.target === archiveModal) {
+                archiveModal.classList.remove('show');
+            }
+        });
+
+        // ==================== REQUESTS MODALS ====================
+        document.getElementById('requestBtn').addEventListener('click', function() {
+            const form = document.getElementById('requestForm');
+            if (form) form.reset();
+            const productNameInput = document.getElementById('requestProductName');
+            if (productNameInput) productNameInput.value = '';
+            const batchInfo = document.getElementById('requestBatchInfo');
+            if (batchInfo) batchInfo.textContent = '';
+            document.getElementById('requestModal').classList.add('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.add('show');
+        });
+        document.getElementById('closeRequestModal').addEventListener('click', function() {
+            const form = document.getElementById('requestForm');
+            if (form) form.reset();
+            const productNameInput = document.getElementById('requestProductName');
+            if (productNameInput) productNameInput.value = '';
+            const batchInfo = document.getElementById('requestBatchInfo');
+            if (batchInfo) batchInfo.textContent = '';
+            document.getElementById('requestModal').classList.remove('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.remove('show');
+        });
+
+        document.getElementById('requestsListBtn').addEventListener('click', async function() {
+            document.getElementById('requestsListModal').classList.add('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.add('show');
+            await loadRequests();
+        });
+        document.getElementById('closeRequestsListModal').addEventListener('click', function() {
+            document.getElementById('requestsListModal').classList.remove('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.remove('show');
+        });
+
+        const requestsListPdfBtn = document.getElementById('requestsListPdfBtn');
+        if (requestsListPdfBtn) {
+            requestsListPdfBtn.addEventListener('click', async function() {
+                await downloadRequestsPdf();
+            });
+        }
+
+        document.getElementById('requestsDoneBtn').addEventListener('click', async function() {
+            document.getElementById('requestsDoneModal').classList.add('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.add('show');
+            await loadDoneRequests();
+        });
+        document.getElementById('closeRequestsDoneModal').addEventListener('click', function() {
+            document.getElementById('requestsDoneModal').classList.remove('show');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.classList.remove('show');
+        });
+
+        const doneBatchFilterInput = document.getElementById('requestsDoneBatchFilter');
+        if (doneBatchFilterInput) {
+            doneBatchFilterInput.addEventListener('input', function() {
+                applyDoneRequestsFilter();
+            });
+        }
+
+        // Overlay close for request modals
+        const overlayEl = document.getElementById('overlay');
+        if (overlayEl) {
+            overlayEl.addEventListener('click', function() {
+                const form = document.getElementById('requestForm');
+                if (form) form.reset();
+                const productNameInput = document.getElementById('requestProductName');
+                if (productNameInput) productNameInput.value = '';
+                const batchInfo = document.getElementById('requestBatchInfo');
+                if (batchInfo) batchInfo.textContent = '';
+                document.getElementById('requestModal').classList.remove('show');
+                document.getElementById('requestsListModal').classList.remove('show');
+                document.getElementById('requestsDoneModal').classList.remove('show');
+            });
+        }
+
+        // Submit request
+        document.getElementById('requestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const productName = document.getElementById('requestProductName').value.trim();
+            const batchCode = document.getElementById('requestBatchCode').value.trim();
+            const qtySht = parseInt(document.getElementById('requestQtySht').value) || 0;
+            const qtyKg = parseFloat(document.getElementById('requestQtyKg').value) || 0;
+            const comment = document.getElementById('requestComment').value.trim();
+
+            if (!batchCode) {
+                showAlert('requestAlert', '❌ Введите код партии', 'error');
+                return;
+            }
+            if (!productName) {
+                showAlert('requestAlert', '❌ Партия не найдена. Проверьте код', 'error');
+                return;
+            }
+            if (qtySht === 0 && qtyKg === 0) {
+                showAlert('requestAlert', '❌ Введите количество (шт или кг)', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/requests', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        product_name: productName,
+                        batch_code: batchCode,
+                        quantity_sht: qtySht,
+                        quantity_kg: qtyKg,
+                        comment
+                    })
+                });
+                if (!response) return;
+                const data = await response.json();
+                if (response.ok) {
+                    showAlert('requestAlert', '✅ Запрос отправлен', 'success');
+                    document.getElementById('requestForm').reset();
+                    setTimeout(() => {
+                        document.getElementById('requestModal').classList.remove('show');
+                        const overlay = document.getElementById('overlay');
+                        if (overlay) overlay.classList.remove('show');
+                    }, 300);
+                } else {
+                    showAlert('requestAlert', '❌ Ошибка: ' + (data.error || ''), 'error');
+                }
+            } catch (err) {
+                showAlert('requestAlert', '❌ Ошибка: ' + err.message, 'error');
+            }
+        });
+
+        // Auto-fill by batch code
+        let batchLookupTimer = null;
+        const batchCodeInput = document.getElementById('requestBatchCode');
+        const batchInfo = document.getElementById('requestBatchInfo');
+        const productNameInput = document.getElementById('requestProductName');
+        batchCodeInput.addEventListener('input', function() {
+            const code = batchCodeInput.value.trim();
+            if (batchLookupTimer) clearTimeout(batchLookupTimer);
+            if (!code) {
+                batchInfo.textContent = '';
+                productNameInput.value = '';
+                return;
+            }
+            batchLookupTimer = setTimeout(async () => {
+                try {
+                    const response = await fetchWithAuth(`/api/batches/by-code?code=${encodeURIComponent(code)}`);
+                    if (!response) return;
+                    const data = await response.json();
+                    if (response.ok) {
+                        productNameInput.value = data.product_name || '';
+                        const sht = data.quantity_sht || 0;
+                        const kg = data.quantity_kg || 0;
+                        batchInfo.textContent = `В наличии: ${sht} шт / ${kg} кг`;
+                        batchInfo.style.color = '#2e7d32';
+                    } else {
+                        batchInfo.textContent = data.error || 'Партия не найдена';
+                        batchInfo.style.color = '#c0392b';
+                        productNameInput.value = '';
+                    }
+                } catch (err) {
+                    batchInfo.textContent = 'Ошибка поиска';
+                    batchInfo.style.color = '#c0392b';
+                    productNameInput.value = '';
+                }
+            }, 400);
+        });
+
+        let requestsCache = [];
+
+        function renderRequestsList(items, includeActions, emptyMessage) {
+            const container = document.getElementById('requestsList');
+            if (!items || items.length === 0) {
+                container.innerHTML = `<p style="color:#999;">${emptyMessage || 'Запросов нет'}</p>`;
+                return;
+            }
+                        let html = '<table style="width:100%; border-collapse: separate; border-spacing: 0 0; font-size: 18px;">';
+                        html += '<tr style="border-bottom:1px solid #ddd;">'
+                                    + '<th style="text-align:center; padding:8px;">Товар</th>'
+                                    + '<th style="text-align:center; padding:8px;">Партия</th>'
+                                + '<th style="text-align:center; padding:8px;">Ячейка</th>'
+                                    + '<th style="text-align:center; padding:8px;">Шт</th>'
+                                    + '<th style="text-align:center; padding:8px 16px 8px 8px;">Кг</th>'
+                                    + '<th style="text-align:center; padding:8px 8px 8px 16px;">Комментарий</th>'
+                                    + '<th style="text-align:center; padding:8px;">Статус</th>'
+                                    + '<th style="text-align:center; padding:8px;">Дата</th>'
+                                    + (includeActions ? '<th style="text-align:center; padding:8px;">Готово</th>' : '')
+                                    + (includeActions ? '<th style="text-align:center; padding:8px;">Не выполнено</th>' : '')
+                                    + '</tr>';
+            items.forEach(r => {
+                html += `<tr style="border-bottom:1px solid #eee;">`
+                     + `<td style="padding:8px; text-align:center;">${r.product_name || ''}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.batch_code || '-'}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.location || '-'}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.quantity_sht || 0}</td>`
+                     + `<td style="padding:8px 16px 8px 8px; text-align:center;">${(r.quantity_kg || 0).toFixed ? (r.quantity_kg || 0).toFixed(0) : r.quantity_kg}</td>`
+                     + `<td style="padding:8px 8px 8px 16px; text-align:center;">${r.comment || ''}</td>`
+                     + `<td style="padding:8px; text-align:center;">Новый</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.created_at || ''}</td>`
+                     + (includeActions ? `<td style="padding:8px; text-align:center;"><button data-done-id="${r.id}" style="background:#2e7d32;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;">✓</button></td>` : '')
+                     + (includeActions ? `<td style="padding:8px; text-align:center;"><button data-failed-id="${r.id}" style="background:#d32f2f;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;">✕</button></td>` : '')
+                     + `</tr>`;
+            });
+            html += '</table>';
+            container.innerHTML = html;
+
+            if (includeActions) {
+                container.querySelectorAll('[data-done-id]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const id = btn.getAttribute('data-done-id');
+                        const res = await fetchWithAuth(`/api/requests/${id}/done`, { method: 'PUT' });
+                        if (!res) return;
+                        if (res.ok) {
+                            await loadRequests();
+                        }
+                    });
+                });
+                container.querySelectorAll('[data-failed-id]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const id = btn.getAttribute('data-failed-id');
+                        const res = await fetchWithAuth(`/api/requests/${id}/failed`, { method: 'PUT' });
+                        if (!res) return;
+                        if (res.ok) {
+                            await loadRequests();
+                        }
+                    });
+                });
+            }
+        }
+
+        function buildRequestsPdfContent(items) {
+            const wrapper = document.createElement('div');
+            wrapper.style.padding = '16px';
+            wrapper.innerHTML = '<h2 style="margin:0 0 12px 0;">Запросы на склад</h2>';
+            if (!items || items.length === 0) {
+                const empty = document.createElement('p');
+                empty.textContent = 'Запросов нет';
+                wrapper.appendChild(empty);
+                return wrapper;
+            }
+            let html = '<table style="width:100%; border-collapse: collapse; font-size: 13px;">';
+            html += '<tr>'
+                + '<th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Товар</th>'
+                + '<th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Партия</th>'
+                + '<th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Ячейка</th>'
+                + '<th style="text-align:right; padding:6px; border-bottom:1px solid #ddd;">Шт</th>'
+                + '<th style="text-align:right; padding:6px; border-bottom:1px solid #ddd;">Кг</th>'
+                + '<th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Комментарий</th>'
+                + '<th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Статус</th>'
+                + '<th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Дата</th>'
+                + '<th style="text-align:center; padding:6px; border-bottom:1px solid #ddd;">Готово</th>'
+                + '<th style="text-align:center; padding:6px; border-bottom:1px solid #ddd;">Не выполнено</th>'
+                  + '</tr>';
+            items.forEach(r => {
+                const statusLabel = r.status === 'DONE' ? 'Выполнен' : (r.status === 'FAILED' ? 'Не выполнен' : 'Новый');
+                const doneMark = r.status === 'DONE' ? '✓' : '';
+                const failedMark = r.status === 'FAILED' ? '✕' : '';
+                html += '<tr style="page-break-inside: avoid;">'
+                   + `<td style="padding:6px; border-bottom:1px solid #eee;">${r.product_name || ''}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee;">${r.batch_code || '-'}</td>`
+                     + `<td style="padding:6px; border-bottom:1px solid #eee;">${r.location || '-'}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee; text-align:right;">${r.quantity_sht || 0}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee; text-align:right;">${(r.quantity_kg || 0).toFixed ? (r.quantity_kg || 0).toFixed(0) : r.quantity_kg}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee;">${r.comment || ''}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee;">${statusLabel}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee;">${r.created_at || ''}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee; text-align:center;">${doneMark || '&nbsp;'}</td>`
+                   + `<td style="padding:6px; border-bottom:1px solid #eee; text-align:center;">${failedMark || '&nbsp;'}</td>`
+                     + '</tr>';
+            });
+            html += '</table>';
+            const tableWrap = document.createElement('div');
+            tableWrap.innerHTML = html;
+            wrapper.appendChild(tableWrap);
+            return wrapper;
+        }
+
+        async function downloadRequestsPdf() {
+            let items = [];
+            try {
+                const response = await fetchWithAuth('/api/requests');
+                if (response && response.ok) {
+                    const data = await response.json();
+                    items = Array.isArray(data) ? data : [];
+                } else {
+                    items = requestsCache;
+                }
+            } catch (err) {
+                items = requestsCache;
+            }
+            const content = buildRequestsPdfContent(items);
+            content.style.position = 'fixed';
+            content.style.left = '0';
+            content.style.top = '0';
+            content.style.opacity = '1';
+            content.style.pointerEvents = 'none';
+            content.style.width = '100%';
+            content.style.zIndex = '-1';
+            content.style.background = '#fff';
+            document.body.appendChild(content);
+
+            await new Promise(resolve => setTimeout(resolve, 150));
+
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const filename = `requests-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}.pdf`;
+
+            await html2pdf()
+                .set({
+                    margin: 10,
+                    filename,
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    pagebreak: { mode: ['css', 'legacy'] },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                })
+                .from(content)
+                .save();
+
+            document.body.removeChild(content);
+        }
+
+        async function loadRequests() {
+            const container = document.getElementById('requestsList');
+            container.innerHTML = '<p style="color:#999;">Загрузка...</p>';
+            try {
+                const response = await fetchWithAuth('/api/requests?status=NEW');
+                if (!response) return;
+                const items = await response.json();
+                requestsCache = Array.isArray(items) ? items : [];
+                renderRequestsList(requestsCache, true, 'Запросов нет');
+            } catch (err) {
+                container.innerHTML = '<p style="color:red;">Ошибка загрузки</p>';
+            }
+        }
+
+        let doneRequestsCache = [];
+        let doneFilteredCache = [];
+        let doneCurrentPage = 1;
+        let donePageSize = 12;
+
+        function renderDoneRequestsPagination(total) {
+            const pagination = document.getElementById('requestsDonePagination');
+            if (!pagination) return;
+            const totalPages = Math.ceil(total / donePageSize);
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            let pagHtml = '';
+            const groupSize = 10;
+            const currentGroup = Math.floor((doneCurrentPage - 1) / groupSize);
+            const startPage = currentGroup * groupSize + 1;
+            const endPage = Math.min(startPage + groupSize - 1, totalPages);
+            if (startPage > 1) {
+                pagHtml += `<button onclick="gotoDonePage(${startPage - 1})" style="padding: 4px 10px; margin: 0 2px; border-radius: 4px; border: 1px solid #dedede; background: #fff; color: #333; cursor:pointer;">&#8592;</button>`;
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                pagHtml += `<button onclick="gotoDonePage(${i})" style="padding: 4px 10px; margin: 0 2px; border-radius: 4px; border: 1px solid #dedede; background: ${i === doneCurrentPage ? '#e04a6a' : '#fff'}; color: ${i === doneCurrentPage ? '#fff' : '#333'}; font-weight: ${i === doneCurrentPage ? 'bold' : 'normal'}; cursor:pointer;">${i}</button>`;
+            }
+            if (endPage < totalPages) {
+                pagHtml += `<button onclick="gotoDonePage(${endPage + 1})" style="padding: 4px 10px; margin: 0 2px; border-radius: 4px; border: 1px solid #dedede; background: #fff; color: #333; cursor:pointer;">&#8594;</button>`;
+            }
+            pagination.innerHTML = pagHtml;
+        }
+
+        function gotoDonePage(page) {
+            doneCurrentPage = page;
+            renderDoneRequests(doneFilteredCache, 'Выполненных запросов нет');
+        }
+
+        function renderDoneRequests(items, emptyMessage) {
+            const container = document.getElementById('requestsDoneList');
+            if (!items || items.length === 0) {
+                container.innerHTML = `<p style="color:#999;">${emptyMessage || 'Выполненных запросов нет'}</p>`;
+                renderDoneRequestsPagination(0);
+                return;
+            }
+            const total = items.length;
+            const totalPages = Math.ceil(total / donePageSize);
+            if (doneCurrentPage > totalPages) doneCurrentPage = totalPages || 1;
+            if (doneCurrentPage < 1) doneCurrentPage = 1;
+            const start = (doneCurrentPage - 1) * donePageSize;
+            const end = start + donePageSize;
+            const pageItems = items.slice(start, end);
+                        let html = '<table style="width:100%; border-collapse: separate; border-spacing: 0 0; font-size: 18px;">';
+                                html += '<tr style="border-bottom:1px solid #ddd;">'
+                                        + '<th style="text-align:center; padding:8px; width:40px;">№</th>'
+                                        + '<th style="text-align:center; padding:8px;">Товар</th>'
+                                        + '<th style="text-align:center; padding:8px;">Партия</th>'
+                                        + '<th style="text-align:center; padding:8px;">Ячейка</th>'
+                                    + '<th style="text-align:center; padding:8px;">Шт</th>'
+                                    + '<th style="text-align:center; padding:8px 16px 8px 8px;">Кг</th>'
+                                    + '<th style="text-align:center; padding:8px 8px 8px 16px;">Комментарий</th>'
+                                    + '<th style="text-align:center; padding:8px;">Статус</th>'
+                                    + '<th style="text-align:center; padding:8px;">Дата</th>'
+                                    + '</tr>';
+            pageItems.forEach((r, index) => {
+                const statusLabel = r.status === 'FAILED' ? '✕ Не выполнен' : '✓ Выполнен';
+                const statusColor = r.status === 'FAILED' ? '#d32f2f' : '#2e7d32';
+                const rowNumber = total - (start + index);
+                 html += `<tr style="border-bottom:1px solid #eee;">`
+                     + `<td style="padding:8px; text-align:center;">${rowNumber}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.product_name || ''}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.batch_code || '-'}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.location || '-'}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.quantity_sht || 0}</td>`
+                     + `<td style="padding:8px 16px 8px 8px; text-align:center;">${(r.quantity_kg || 0).toFixed ? (r.quantity_kg || 0).toFixed(0) : r.quantity_kg}</td>`
+                     + `<td style="padding:8px 8px 8px 16px; text-align:center;">${r.comment || ''}</td>`
+                     + `<td style="padding:8px; color:${statusColor}; font-weight:600; text-align:center;">${statusLabel}</td>`
+                     + `<td style="padding:8px; text-align:center;">${r.created_at || ''}</td>`
+                     + `</tr>`;
+            });
+            html += '</table>';
+            container.innerHTML = html;
+            renderDoneRequestsPagination(total);
+        }
+
+        function applyDoneRequestsFilter() {
+            const filterInput = document.getElementById('requestsDoneBatchFilter');
+            const term = (filterInput ? filterInput.value : '').trim().toLowerCase();
+            if (!term) {
+                doneFilteredCache = doneRequestsCache.slice();
+                doneCurrentPage = 1;
+                renderDoneRequests(doneFilteredCache, 'Выполненных запросов нет');
+                return;
+            }
+            doneFilteredCache = doneRequestsCache.filter(r => (r.batch_code || '').toLowerCase().includes(term));
+            doneCurrentPage = 1;
+            renderDoneRequests(doneFilteredCache, 'Ничего не найдено');
+        }
+
+        async function loadDoneRequests() {
+            const container = document.getElementById('requestsDoneList');
+            container.innerHTML = '<p style="color:#999;">Загрузка...</p>';
+            try {
+                const response = await fetchWithAuth('/api/requests?status=COMPLETED');
+                if (!response) return;
+                const items = await response.json();
+                doneRequestsCache = Array.isArray(items) ? items : [];
+                doneFilteredCache = doneRequestsCache.slice();
+                doneCurrentPage = 1;
+                applyDoneRequestsFilter();
+            } catch (err) {
+                container.innerHTML = '<p style="color:red;">Ошибка загрузки</p>';
+            }
+        }
+        
+        function populateYears() {
+            // No longer needed - using input type="month" instead
+        }
+
+        
+        document.getElementById('archiveFilterBtn').addEventListener('click', async function() {
+            const startDate = document.getElementById('archiveStartDate').value;
+            const endDate = document.getElementById('archiveEndDate').value;
+            const searchTerm = document.getElementById('archiveSearch').value.trim().toLowerCase();
+            try {
+                const params = new URLSearchParams();
+                if (startDate) params.append('start_date', startDate);
+                if (endDate) params.append('end_date', endDate);
+                
+                const response = await fetchWithAuth(`/api/archive?${params.toString()}`);
+                if (!response) {
+                    document.getElementById('archiveResult').innerHTML = '<p style="color:#999;">Данные архива не найдены</p>';
+                    return;
+                }
+                
+                const data = await response.json();
+                renderArchiveResult(data, searchTerm);
+            } catch (error) {
+                document.getElementById('archiveResult').innerHTML = '<p style="color:red;">Ошибка: ' + error.message + '</p>';
+            }
+        });
+
+        document.getElementById('archiveExportBtn').addEventListener('click', async function() {
+            const startDate = document.getElementById('archiveStartDate').value;
+            const endDate = document.getElementById('archiveEndDate').value;
+            const searchTerm = document.getElementById('archiveSearch').value.trim();
+            const params = new URLSearchParams();
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            if (searchTerm) params.append('search', searchTerm);
+
+            try {
+                const response = await fetch(`/api/archive/export?${params.toString()}`);
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '/login';
+                    return;
+                }
+                if (!response.ok) {
+                    showAlert('batchesAlert', '❌ Не удалось скачать Excel', 'error');
+                    return;
+                }
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                let suffix = 'all';
+                if (startDate && endDate) {
+                    suffix = `${startDate}_to_${endDate}`;
+                } else if (startDate) {
+                    suffix = `from_${startDate}`;
+                } else if (endDate) {
+                    suffix = `to_${endDate}`;
+                }
+                a.download = `arxiv_${suffix}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                showAlert('batchesAlert', '❌ Ошибка: ' + error.message, 'error');
+            }
+        });
+        
+        function renderArchiveResult(data, searchTerm = '') {
+            const result = document.getElementById('archiveResult');
+            
+            if (!data.incoming || !data.outgoing || (data.incoming.length === 0 && data.outgoing.length === 0)) {
+                result.innerHTML = '<p style="color:#999;">📭 За этот период данных нет</p>';
+                return;
+            }
+            
+            function matchesSearch(item) {
+                if (!searchTerm) return true;
+                const code = (item.batch_code || '').toLowerCase();
+                const name = (item.product_name || '').toLowerCase();
+                return code.includes(searchTerm) || name.includes(searchTerm);
+            }
+
+            // Group by batch_code and sum quantities
+            function groupByBatchCode(items) {
+                const grouped = {};
+                items.filter(matchesSearch).forEach(item => {
+                    const key = item.batch_code;
+                    if (!grouped[key]) {
+                        grouped[key] = {
+                            product_name: item.product_name,
+                            batch_code: item.batch_code,
+                            quantity_sht: 0,
+                            quantity_kg: 0
+                        };
+                    }
+                    grouped[key].quantity_sht += (item.quantity_sht || 0);
+                    grouped[key].quantity_kg += (item.quantity_kg || 0);
+                });
+                return Object.values(grouped);
+            }
+            
+            const incomingGrouped = groupByBatchCode(data.incoming || []);
+            const outgoingGrouped = groupByBatchCode(data.outgoing || []);
+            
+            let html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">';
+            
+            // Prixod (Kirim)
+            html += '<div style="border: 2px solid #27ae60; border-radius: 8px; padding: 15px; background: #f0fdf4;">';
+            html += '<h3 style="color: #27ae60; margin-top: 0;">📥 Приход</h3>';
+            if (incomingGrouped.length > 0) {
+                html += '<div style="max-height: 430px; overflow-y: auto;">';
+                html += '<table style="width: 100%; border-collapse: collapse; font-size: 15px;">';
+                html += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Товар</th><th style="text-align: left; padding: 8px;">Партия</th><th style="text-align: right; padding: 8px;">Шт</th><th style="text-align: right; padding: 8px;">Кг</th></tr>';
+                let totalSht = 0, totalKg = 0;
+                incomingGrouped.forEach(item => {
+                    const sht = item.quantity_sht || 0;
+                    const kg = item.quantity_kg || 0;
+                    totalSht += sht;
+                    totalKg += kg;
+                    html += `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">${item.product_name}</td><td style="padding: 8px;">${item.batch_code}</td><td style="text-align: right; padding: 8px;">${sht}</td><td style="text-align: right; padding: 8px;">${kg.toFixed(0)}</td></tr>`;
+                });
+                html += `<tr style="background: #e8f5e9; font-weight: bold;"><td style="padding: 10px;">Итого:</td><td style="padding: 10px;"></td><td style="text-align: right; padding: 10px;">${totalSht}</td><td style="text-align: right; padding: 10px;">${totalKg.toFixed(0)}</td></tr>`;
+                html += '</table>';
+                html += '</div>';
+            } else {
+                html += '<p style="color: #999; margin: 10px 0;">Нет данных по приходу</p>';
+            }
+            html += '</div>';
+            
+            // Rasxod (Chiqim)
+            html += '<div style="border: 2px solid #e04a6a; border-radius: 8px; padding: 15px; background: #fdf2f5;">';
+            html += '<h3 style="color: #e04a6a; margin-top: 0;">📤 Расход</h3>';
+            if (outgoingGrouped.length > 0) {
+                html += '<div style="max-height: 430px; overflow-y: auto;">';
+                html += '<table style="width: 100%; border-collapse: collapse; font-size: 15px;">';
+                html += '<tr style="border-bottom: 1px solid #ddd;"><th style="text-align: left; padding: 8px;">Товар</th><th style="text-align: left; padding: 8px;">Партия</th><th style="text-align: right; padding: 8px;">Шт</th><th style="text-align: right; padding: 8px;">Кг</th></tr>';
+                let totalSht = 0, totalKg = 0;
+                outgoingGrouped.forEach(item => {
+                    const sht = item.quantity_sht || 0;
+                    const kg = item.quantity_kg || 0;
+                    totalSht += sht;
+                    totalKg += kg;
+                    html += `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;">${item.product_name}</td><td style="padding: 8px;">${item.batch_code}</td><td style="text-align: right; padding: 8px;">${sht}</td><td style="text-align: right; padding: 8px;">${kg.toFixed(0)}</td></tr>`;
+                });
+                html += `<tr style="background: #ffe0e6; font-weight: bold;"><td style="padding: 10px;">Итого:</td><td style="padding: 10px;"></td><td style="text-align: right; padding: 10px;">${totalSht}</td><td style="text-align: right; padding: 10px;">${totalKg.toFixed(0)}</td></tr>`;
+                html += '</table>';
+                html += '</div>';
+            } else {
+                html += '<p style="color: #999; margin: 10px 0;">Нет данных по расходу</p>';
+            }
+            html += '</div>';
+            
+            html += '</div>';
+            result.innerHTML = html;
+        }
+        
+        // ==================== ALERTS ====================
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+    </script>
+</body>
+</html>
